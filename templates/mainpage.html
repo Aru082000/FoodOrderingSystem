@@ -21,11 +21,11 @@
             }
 
             .box ul li{
-                width: 180px;
+                width: 140px;
                 float: left;
-                margin: 10px auto;
+                margin: 15px;
                 text-align: center;
-                font-size: 15px;
+                font-size: 20px;
             }
 
             .box ul li a{
@@ -36,20 +36,33 @@
 
             .box ul li:hover{
                 background-color: green;
+
             }
 
             .box ul li a:hover{
                 color: white;
-                font-size: 18px;
+                font-size: 25px;
             }
 
 
             .wd{
                 width: 300px;
-                height: 900px;
+                height: 600px;
                 background-color: black;
                 opacity: 0.9;
                 padding: 55px;
+                /*position: fixed;
+                left: 40%;
+                top: 10%;*/
+
+                position: absolute;
+                top:0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                
+                margin: auto;
+                border-radius: 10px;
             }
 
             .wd h1{
@@ -110,6 +123,7 @@
             <h1> Welcome, {{ session.fullname }}! </h1>
 
             <h4>PetPooja restraunt is a take away restraunt where you can order amazing food just at a click of a button. We hope we can fulfil your expectations.</h4>
+            <br><br><br>
             <h2> Make an order</h2>
             <div class="opt">
                 <form action = "" method = "POST">
