@@ -15,8 +15,8 @@ import pytz
 
 from werkzeug.datastructures import iter_multi_items
 
-cluster = MongoClient('mongodb+srv://verain111:OofOofKgn@cluster0.oggqb.mongodb.net/test?retryWrites=true&w=majority')
 
+cluster = pymongo.MongoClient("mongodb://localhost:27017/")
 
 app = Flask(__name__)
 
@@ -56,6 +56,7 @@ mysql = MySQL(app)
 @app.route("/mainpage", methods = ['POST', 'GET'])
 def mainpage():
     global items_count
+    items_count = items_count
     global opt
     return render_template('mainpage.html', items_count = items_count)
 
@@ -5806,13 +5807,13 @@ def Cart():
     global totalBill
 
     if len(order_list) == 0:
-        print("Empty")
+        
         totalBill = 0
         return render_template('EmptyCart.html',items_count = items_count, item_id = item_id, QTY_list_me = QTY_list_me, sr_list = sr_list, totalBill = totalBill, order_list = order_list, qty_list = qty_list, price_list = price_list, totalPrice_list = totalPrice_list)
         
 
     else:
-        print("SErial:     ", sr_list)
+        
         totalBill = sum(totalPrice_list)
         return render_template('Cart.html',items_count = items_count, item_id = item_id, QTY_list_me = QTY_list_me, sr_list = sr_list, totalBill = totalBill, order_list = order_list, qty_list = qty_list, price_list = price_list, totalPrice_list = totalPrice_list)
 
@@ -5835,14 +5836,12 @@ def update(id):
     except :
         dbtn = False
     if dbtn :
-        print("I'm working")
+    
         remove(int(id))
         return redirect(url_for('Cart'))
 
-    print("###############", id, request.form)
-    print(request.form[id])
     qty = request.form[id]
-    print(qty)
+    
     qty = int(qty)
     id = int(id)
     index1 = item_id.index(id)
@@ -5851,10 +5850,10 @@ def update(id):
     totalPrice_list[index1] = qty * price_list[index1]
     #totalBill = sum(totalPrice_list)
 
-    print(order_list)
-    print(qty_list)
-    print(totalPrice_list)
-    print(totalBill)
+    # print(order_list)
+    # print(qty_list)
+    # print(totalPrice_list)
+    # print(totalBill)
 
     return redirect(url_for('Cart'))
 
@@ -5923,16 +5922,17 @@ def confirmorder():
     results = collection.find()
     for result in results:
         list_2.append(result)
-        print(list_2)
+        # print(list_2)
 
     count = len(list_2)
     if count == 0:
         id = 1
-        post = { "_id": id, "CustomerID": session['id'], "CustomerName": session['fullname'], "date": Date_time,"Order": order_list, "Quantity": qty_list, "Price": price_list, "TotalPrice": totalPrice_list, "TotalBill": totalBill}
+        post = { "_id": id, "CustomerID": session['id'], "CustomerName": session['fullname'], "date": Date_time,"Order": order_list, "Quantity": qty_list, "Price": price_list, "TotalPrice": totalPrice_list, "TotalBill": totalBill, "Status": "In-Progress"}
         collection.insert_one(post)
     else:
         id = count + 1
-        post = { "_id": id, "CustomerID": session['id'], "CustomerName": session['fullname'], "date": Date_time, "Order": order_list, "Quantity": qty_list, "Price": price_list, "TotalPrice": totalPrice_list, "TotalBill": totalBill}
+        post = { "_id": id, "CustomerID": session['id'], "CustomerName": session['fullname'], "date": Date_time, "Order": order_list, "Quantity": qty_list, "Price": price_list, "TotalPrice": totalPrice_list, "TotalBill": totalBill, "Status": "In-Progress"}
+        print(post)
         collection.insert_one(post)
 
     order_list = []
@@ -5974,14 +5974,16 @@ def PreviousOrders():
     collection = db["test"]  #cluster name
 
     orders = []
-    if session['id'] == 12:
+    if session['id'] == 1:
         results = collection.find()
     else:
         results = collection.find({"CustomerID":session['id']})
     for result in results:
         orders.append(result)
+    if len(orders) == 0:
+        print("Empty")
+        return render_template('NoOrders.html')
     
-    #print(orders)
 
 
     return render_template('PreviousOrders.html', orders = orders)
@@ -5994,12 +5996,22 @@ def login():
 
     global opt1
     opt1 = True
+    username=""
 
     msg = ''
     if request.method == "POST" and 'username' in request.form and 'password' in request.form:
 
         username = request.form.get("username")
         password = request.form.get("password")
+
+        if username == "admin" and password == "admin":
+            session['loggedin'] = True
+            session['id'] = 1
+            session['username'] = "admin"
+            session['fullname'] = "admin"
+            session['age'] = 0
+            session['phonenum'] = 0
+            return render_template('mainpage.html')
         
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE username = % s and password = % s', (username, password))
@@ -6020,7 +6032,7 @@ def login():
         else:
             msg = 'Incorrect username/ password'
 
-    return render_template('login.html', msg = msg) 
+    return render_template('login.html', msg = msg, login=username) 
 
 
 
@@ -6054,6 +6066,10 @@ def logout():
 @app.route("/register", methods = ["POST", "GET"])
 def register():
     msg = ''
+    username = ""
+    fullname = ""
+    phonenum = ""
+    age = ""
     if request.method == "POST" and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
@@ -6075,6 +6091,7 @@ def register():
 
         elif len(phonenum) != 10:
             msg = "Enter a valid phone number"
+            phonenum = ""
 
 
         elif len(password) > 15:
@@ -6082,6 +6099,7 @@ def register():
 
         elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'Username must contain only characters and numbers!'
+            username = ""
 
         elif not re.search("[a-z]", password):
             msg = 'Password must contain atleast one lowercase letter!'
@@ -6106,7 +6124,8 @@ def register():
 
     elif request.method == 'POST':
         msg = 'Please fill out the form!'
-    return render_template('register.html', msg = msg)
+    return render_template('register.html', msg = msg, user = username, full = fullname, phone = phonenum, a = age)
+
 
 
 

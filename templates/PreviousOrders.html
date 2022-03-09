@@ -159,6 +159,7 @@ tr:hover {
             <th>Price</th>
             <th>Total Price</th>
             <th>Total Bill</th>
+            <th>Status</th>
         </tr>
         
 
@@ -189,6 +190,10 @@ tr:hover {
 
         <td>
             ₹ {{ orders[i]['TotalBill'] }}
+        </td>
+
+        <td style="color: green;">
+            {{ orders[i]['Status'] }}
         </td>
 
     </tr>

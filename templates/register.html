@@ -98,12 +98,12 @@
         <div class="loginBox">
             <img src = "https://cdn3.iconfinder.com/data/icons/essential-rounded/64/Rounded-31-512.png" class = "avatar">
                 <h1>Signup here</h1>
-                <form action="{{ url_for('register')}}" method="POST">
+                <form action="{{ url_for('register')}}" method="POST" autocomplete="off">
                     <div class="msg">{{ msg }}</div>
-                    <input type="text" name = "fullname" placeholder="Enter full name">
-                    <input type="text" name = "username" placeholder="Enter username">
-                    <input type="text" name = "phonenum" placeholder="Enter phone number">
-                    <input type="text" name = "age" placeholder="Enter age">
+                    <input type="text" name = "fullname" value="{{ full }}" placeholder="Enter full name">
+                    <input type="text" name = "username" value="{{ user }}" placeholder="Enter username">
+                    <input type="text" name = "phonenum" value="{{ phone }}" placeholder="Enter phone number">
+                    <input type="text" name = "age" value="{{ a }}" placeholder="Enter age">
                     <input type="password" name = "password" placeholder="Enter password">
                     <input type="submit" value="Sign up">
                 </form>
